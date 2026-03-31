@@ -1,0 +1,45 @@
+# Spring / Maven
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Gradle
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# IDEs
+## STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+## IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+## NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+## VS Code
+.vscode/
+
+# OS / misc
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*~

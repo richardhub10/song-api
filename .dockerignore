@@ -1,0 +1,39 @@
+# VCS
+.git
+.gitignore
+
+# Build output / caches
+target/
+build/
+dist/
+out/
+
+# Logs
+*.log
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Env / secrets (don’t bake these into images)
+.env
+.env.*
+*.pem
+*.key
+
+# Dependency caches (language-specific; keep/remove as appropriate)
+node_modules/
+.npm/
+.yarn/
+.pnpm-store/
+
+# Test / coverage artifacts
+coverage/
+*.lcov
+
+# Docs (optional)
+*.md

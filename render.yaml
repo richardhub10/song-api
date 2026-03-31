@@ -1,0 +1,32 @@
+databases:
+  - name: song-api-db
+    plan: free
+
+services:
+  - type: web
+    name: song-api
+    env: docker
+    plan: free
+    autoDeploy: true
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: DB_HOST
+        fromDatabase:
+          name: song-api-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: song-api-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: song-api-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: song-api-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: song-api-db
+          property: password
