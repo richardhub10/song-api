@@ -104,7 +104,10 @@ Set a Postman variable:
   - Free instances may sleep; retry after wake-up
 
 ## 7) Supabase notes
-- Use Supabase **direct** Postgres connection details (host/port/user/password/db) from Supabase project settings.
+- Important for Render: the Supabase **direct** host (`db.<project-ref>.supabase.co`) may be **IPv6-only** (no IPv4 A record). Render often has no IPv6 egress, which causes DB connection failures.
+- Fix: use Supabase **Connection Pooling / Pooler** connection details (host/port/user/password/db) from Supabase project settings instead of the direct host.
+  - In Supabase dashboard: **Project Settings → Database → Connection string → Connection pooling** (or “Pooler”).
+  - Copy the **Host**, **Port**, **Database**, and **User** values shown there into Render env vars.
 - Supabase requires SSL; this repo defaults `DB_PARAMS` to `?sslmode=require` for Render.
 
 ## 8) Optional local run with same config style

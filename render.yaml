@@ -8,6 +8,8 @@ services:
     envVars:
       - key: DB_HOST
         sync: false
+        # Render often has no IPv6 egress. Supabase direct DB host (db.<ref>.supabase.co) can be IPv6-only.
+        # Use Supabase "Connection pooling / Pooler" host here for IPv4 connectivity.
       - key: DB_PORT
         sync: false
       - key: DB_NAME
