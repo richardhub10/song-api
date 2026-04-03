@@ -1,7 +1,3 @@
-databases:
-  - name: song-api-db
-    plan: free
-
 services:
   - type: web
     name: song-api
@@ -11,22 +7,16 @@ services:
     dockerfilePath: ./Dockerfile
     envVars:
       - key: DB_HOST
-        fromDatabase:
-          name: song-api-db
-          property: host
+        sync: false
       - key: DB_PORT
-        fromDatabase:
-          name: song-api-db
-          property: port
+        sync: false
       - key: DB_NAME
-        fromDatabase:
-          name: song-api-db
-          property: database
+        sync: false
       - key: DB_USERNAME
-        fromDatabase:
-          name: song-api-db
-          property: user
+        sync: false
       - key: DB_PASSWORD
-        fromDatabase:
-          name: song-api-db
-          property: password
+        sync: false
+      # Supabase requires SSL. This suffix is appended to the JDBC URL constructed in application.properties.
+      # Example: ?sslmode=require
+      - key: DB_PARAMS
+        value: ?sslmode=require

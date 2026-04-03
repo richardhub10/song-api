@@ -1,4 +1,4 @@
-# Song API - Deploy to Render (PostgreSQL) + Test in Postman
+# Song API - Deploy to Render + Supabase Postgres + Test in Postman
 
 ## 1) Prerequisites
 - GitHub repository with this project pushed
@@ -6,9 +6,9 @@
 - Postman installed
 
 ## 2) Deploy using Render Blueprint (recommended)
-This repo now includes `render.yaml` that provisions both:
-- a PostgreSQL database (`song-api-db`)
-- a Docker web service (`song-api`)
+This repo includes `render.yaml` to provision a **Docker web service** (`song-api`).
+
+Because you're using **Supabase Postgres** (external DB), the blueprint does **not** create a Render-managed database. You will provide the DB credentials as environment variables in Render.
 
 Steps:
 1. Push this repo to GitHub (already done in your case).
@@ -17,14 +17,20 @@ Steps:
 4. Render detects `render.yaml`; confirm and deploy.
 5. Wait until both the database and web service are green.
 
-No manual DB env vars are needed with the blueprint because `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USERNAME`, and `DB_PASSWORD` are injected automatically.
+Before the first deploy finishes, set these env vars on the `song-api` service (Render dashboard -> Service -> Environment):
+- `DB_HOST`
+- `DB_PORT` (usually `5432`)
+- `DB_NAME` (your Supabase database name)
+- `DB_USERNAME`
+- `DB_PASSWORD`
+- `DB_PARAMS` (keep the default `?sslmode=require`)
 
 ## 3) If you deploy manually (without blueprint)
-1. Create a PostgreSQL instance in Render.
-2. Create a Docker Web Service from this repo.
-3. Set env vars on the Web Service:
+1. Create a **Docker Web Service** from this repo.
+2. Set env vars on the Web Service:
   - `DB_HOST`, `DB_PORT`, `DB_NAME`
   - `DB_USERNAME`, `DB_PASSWORD`
+  - `DB_PARAMS=?sslmode=require`
 
 Your app should be reachable at:
 - `https://<your-render-service>.onrender.com`
@@ -97,7 +103,11 @@ Set a Postman variable:
 - **503 first request**:
   - Free instances may sleep; retry after wake-up
 
-## 7) Optional local run with same config style
+## 7) Supabase notes
+- Use Supabase **direct** Postgres connection details (host/port/user/password/db) from Supabase project settings.
+- Supabase requires SSL; this repo defaults `DB_PARAMS` to `?sslmode=require` for Render.
+
+## 8) Optional local run with same config style
 Use your local PostgreSQL and keep these environment variables:
 - `DB_HOST=localhost`
 - `DB_PORT=5432`
