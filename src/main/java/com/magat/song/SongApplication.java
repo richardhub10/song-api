@@ -56,7 +56,6 @@ public class SongApplication {
         if (databaseUrl.startsWith("jdbc:postgresql://")) {
             defaults.put("spring.datasource.url", ensureSslMode(databaseUrl));
             extractUserAndPasswordFromJdbcQuery(defaults, databaseUrl);
-            applyCredentialFallbacks(defaults, true);
             return true;
         }
 
@@ -94,7 +93,6 @@ public class SongApplication {
                 }
             }
 
-            applyCredentialFallbacks(defaults, true);
             return true;
         }
 
