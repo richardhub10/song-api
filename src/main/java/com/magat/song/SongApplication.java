@@ -23,8 +23,9 @@ public class SongApplication {
 
         String databaseUrl = firstPresent("SPRING_DATASOURCE_URL", "JDBC_DATABASE_URL", "DATABASE_URL");
         if (databaseUrl != null && !databaseUrl.isBlank()) {
-            applyDatabaseUrl(defaults, databaseUrl);
-            return defaults;
+            if (applyDatabaseUrl(defaults, databaseUrl)) {
+                return defaults;
+            }
         }
 
         String host = firstPresent("DB_HOST", "PGHOST");
@@ -47,15 +48,16 @@ public class SongApplication {
         }
 
         defaults.put("spring.datasource.url", jdbcUrl);
-        applyCredentialFallbacks(defaults);
+        applyCredentialFallbacks(defaults, false);
         return defaults;
     }
 
-    private static void applyDatabaseUrl(Map<String, Object> defaults, String databaseUrl) {
+    private static boolean applyDatabaseUrl(Map<String, Object> defaults, String databaseUrl) {
         if (databaseUrl.startsWith("jdbc:postgresql://")) {
             defaults.put("spring.datasource.url", ensureSslMode(databaseUrl));
-            applyCredentialFallbacks(defaults);
-            return;
+            extractUserAndPasswordFromJdbcQuery(defaults, databaseUrl);
+            applyCredentialFallbacks(defaults, true);
+            return true;
         }
 
         if (databaseUrl.startsWith("postgres://") || databaseUrl.startsWith("postgresql://")) {
@@ -92,24 +94,62 @@ public class SongApplication {
                 }
             }
 
-            applyCredentialFallbacks(defaults);
+            applyCredentialFallbacks(defaults, true);
+            return true;
         }
+
+        return false;
     }
 
-    private static void applyCredentialFallbacks(Map<String, Object> defaults) {
+    private static void applyCredentialFallbacks(Map<String, Object> defaults, boolean fromDatabaseUrl) {
         if (!defaults.containsKey("spring.datasource.username")) {
-            String username = firstPresent("SPRING_DATASOURCE_USERNAME", "DB_USERNAME", "DB_USER", "PGUSER");
+            String username = fromDatabaseUrl
+                ? firstPresent("SPRING_DATASOURCE_USERNAME", "DATABASE_USERNAME", "PGUSER")
+                : firstPresent("SPRING_DATASOURCE_USERNAME", "DB_USERNAME", "DB_USER", "PGUSER");
             if (username != null && !username.isBlank()) {
                 defaults.put("spring.datasource.username", username);
             }
         }
 
         if (!defaults.containsKey("spring.datasource.password")) {
-            String password = firstPresent("SPRING_DATASOURCE_PASSWORD", "DB_PASSWORD", "PGPASSWORD");
+            String password = fromDatabaseUrl
+                ? firstPresent("SPRING_DATASOURCE_PASSWORD", "DATABASE_PASSWORD", "PGPASSWORD")
+                : firstPresent("SPRING_DATASOURCE_PASSWORD", "DB_PASSWORD", "PGPASSWORD");
             if (password != null && !password.isBlank()) {
                 defaults.put("spring.datasource.password", password);
             }
         }
+    }
+
+    private static void extractUserAndPasswordFromJdbcQuery(Map<String, Object> defaults, String jdbcUrl) {
+        String username = queryValue(jdbcUrl, "user");
+        String password = queryValue(jdbcUrl, "password");
+
+        if (username != null && !username.isBlank()) {
+            defaults.put("spring.datasource.username", decode(username));
+        }
+
+        if (password != null && !password.isBlank()) {
+            defaults.put("spring.datasource.password", decode(password));
+        }
+    }
+
+    private static String queryValue(String jdbcUrl, String key) {
+        int queryStart = jdbcUrl.indexOf('?');
+        if (queryStart < 0 || queryStart + 1 >= jdbcUrl.length()) {
+            return null;
+        }
+
+        String query = jdbcUrl.substring(queryStart + 1);
+        String[] entries = query.split("&");
+        for (String entry : entries) {
+            String[] parts = entry.split("=", 2);
+            if (parts.length == 2 && parts[0].equalsIgnoreCase(key)) {
+                return parts[1];
+            }
+        }
+
+        return null;
     }
 
     private static String firstPresent(String... keys) {
