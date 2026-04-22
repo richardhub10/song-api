@@ -11,18 +11,24 @@ services:
           name: song-api-db
           property: internalConnectionString
       - key: DB_HOST
-        sync: false
-        # Render often has no IPv6 egress. Supabase direct DB host (db.<ref>.supabase.co) can be IPv6-only.
-        # Use Supabase "Connection pooling / Pooler" host here for IPv4 connectivity.
+        fromDatabase:
+          name: song-api-db
+          property: host
       - key: DB_PORT
-        sync: false
+        fromDatabase:
+          name: song-api-db
+          property: port
       - key: DB_NAME
-        sync: false
+        fromDatabase:
+          name: song-api-db
+          property: database
       - key: DB_USERNAME
-        sync: false
+        fromDatabase:
+          name: song-api-db
+          property: user
       - key: DB_PASSWORD
-        sync: false
-      # Supabase requires SSL. This suffix is appended to the JDBC URL constructed in application.properties.
-      # Example: ?sslmode=require
+        fromDatabase:
+          name: song-api-db
+          property: password
       - key: DB_PARAMS
         value: ?sslmode=require
