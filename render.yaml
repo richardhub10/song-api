@@ -32,3 +32,5 @@ services:
           property: password
       - key: DB_PARAMS
         value: ?sslmode=require
+      - key: ALLOWED_ORIGINS
+        value: http://localhost:5173,https://song-ui-hfg8.onrender.com
